@@ -1,184 +1,175 @@
 import { useState } from "react";
-import { useWallet }     from "./hooks/useWallet";
-import { useQuests }     from "./hooks/useQuests";
-import Navbar            from "./components/Navbar";
-import Dashboard         from "./components/Dashboard";
-import QuestBoard        from "./components/QuestBoard";
-import BossRaid          from "./components/BossRaid";
-import Leaderboard       from "./components/Leaderboard";
-import WalletAnalyzer    from "./components/WalletAnalyzer";
+import { useWallet } from "./hooks/useWallet";
+import { useQuests } from "./hooks/useQuests";
+import Navbar from "./components/Navbar";
+import Dashboard from "./components/Dashboard";
+import QuestBoard from "./components/QuestBoard";
+import BossRaid from "./components/BossRaid";
+import Leaderboard from "./components/Leaderboard";
+import WalletAnalyzer from "./components/WalletAnalyzer";
 
 const TABS = [
-  { id: "dashboard",   label: "Dashboard",      icon: "🏠" },
-  { id: "quests",      label: "Quests",          icon: "🗺️" },
-  { id: "bossraid",    label: "Boss Raid",       icon: "🐉" },
-  { id: "leaderboard", label: "Leaderboard",     icon: "🏆" },
-  { id: "analyzer",    label: "Wallet Analyzer", icon: "🔍" },
+  { id: "dashboard", label: "Dashboard", icon: "/dashboard.svg" },
+  { id: "quests", label: "Quests", icon: "/quests.svg" },
+  { id: "bossraid", label: "Boss", icon: "/boss.svg" },
+  { id: "analyzer", label: "Wallet", icon: "/wallet.svg" }
 ];
 
+const ICON_BLUE = "#0082FF";
+
 export default function App() {
+  const [page, setPage] = useState("dashboard");
   const [activeTab, setActiveTab] = useState("dashboard");
+  const [highlightPosition, setHighlightPosition] = useState(0);
+
   const wallet = useWallet();
   const quests = useQuests(wallet);
 
   const walletWithProfile = { ...wallet, userProfile: quests.userProfile };
 
-  const renderTab = () => {
-    switch (activeTab) {
-      case "dashboard":   return <Dashboard    quests={quests} wallet={wallet} setActiveTab={setActiveTab} />;
-      case "quests":      return <QuestBoard   quests={quests} wallet={wallet} />;
-      case "bossraid":    return <BossRaid     wallet={wallet} />;
-      case "leaderboard": return <Leaderboard  wallet={wallet} />;
-      case "analyzer":    return <WalletAnalyzer wallet={wallet} />;
-      default:            return <Dashboard    quests={quests} wallet={wallet} setActiveTab={setActiveTab} />;
-    }
+  const pageIndex = {
+    dashboard: 0,
+    quests: 1,
+    bossraid: 2,
+    analyzer: 3
   };
 
-  return (
-    <div style={{
-      minHeight:  "100vh",
-      background: "#0a0b0f",
-      color:      "white",
-      fontFamily: "'Inter', sans-serif",
-    }}>
+  const isLeaderboard = page === "leaderboard";
 
-      {/* Navbar */}
+  return (
+    <div
+      style={{
+        minHeight: "100vh",
+        background: "#0a0b0f",
+        color: "white",
+        fontFamily: "'Inter', sans-serif",
+        overflowX: "hidden"
+      }}
+    >
       <Navbar wallet={walletWithProfile} />
 
-      {/* Tab bar */}
-      <div style={{
-        borderBottom:   "1px solid rgba(255,255,255,0.06)",
-        background:     "rgba(255,255,255,0.02)",
-        backdropFilter: "blur(10px)",
-        position:       "sticky",
-        top:            "64px",
-        zIndex:         90,
-        overflowX:      "auto",
-      }}>
-        <div style={{ display: "flex", maxWidth: "1100px", margin: "0 auto", padding: "0 16px" }}>
-          {TABS.map(tab => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              style={{
-                background:   "none",
-                border:       "none",
-                borderBottom: activeTab === tab.id ? "2px solid #0052ff" : "2px solid transparent",
-                padding:      "14px 18px",
-                color:        activeTab === tab.id ? "white" : "#8892a4",
-                fontWeight:   activeTab === tab.id ? "700" : "500",
-                fontSize:     "13px",
-                cursor:       "pointer",
-                whiteSpace:   "nowrap",
-                transition:   "all 0.2s",
-                display:      "flex",
-                alignItems:   "center",
-                gap:          "6px",
-              }}
-            >
-              <span>{tab.icon}</span>
-              <span>{tab.label}</span>
-              {tab.id === "bossraid" && (
-                <span style={{
-                  background:   "rgba(255,59,59,0.2)",
-                  border:       "1px solid rgba(255,59,59,0.4)",
-                  borderRadius: "20px",
-                  padding:      "1px 7px",
-                  color:        "#ff6b6b",
-                  fontSize:     "10px",
-                  fontWeight:   "800",
-                  marginLeft:   "2px",
-                }}>LIVE</span>
-              )}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Page content */}
-      <div style={{ maxWidth: "1100px", margin: "0 auto", padding: "0 16px 80px" }}>
-        {renderTab()}
-      </div>
-
-      {/* Footer */}
-      <div style={{
-        borderTop:  "1px solid rgba(255,255,255,0.06)",
-        padding:    "24px 16px 100px",
-        textAlign:  "center",
-        marginTop:  "40px",
-      }}>
-        <div style={{ display: "flex", justifyContent: "center", gap: "24px", marginBottom: "12px" }}>
-          <a
-            href="https://twitter.com/Jee_phoenix"
-            target="_blank" rel="noreferrer"
-            style={{ color: "#8892a4", fontSize: "13px", fontWeight: "600", textDecoration: "none", display: "flex", alignItems: "center", gap: "6px" }}
-            onMouseEnter={e => e.currentTarget.style.color = "white"}
-            onMouseLeave={e => e.currentTarget.style.color = "#8892a4"}
-          >
-            𝕏 Contact Us
-          </a>
-        </div>
-        <div style={{ color: "#4a5568", fontSize: "12px", marginBottom: "4px" }}>
-          © 2026 BaseQuest™ — All rights reserved.
-        </div>
-        <div style={{ color: "#4a5568", fontSize: "11px" }}>
-          Built with 💙 on Base 🟦
-        </div>
-      </div>
-
-      {/* Mobile bottom nav */}
-      <div style={{
-        display:        "flex",
-        position:       "fixed",
-        bottom:         0,
-        left:           0,
-        right:          0,
-        background:     "rgba(10,11,15,0.95)",
-        borderTop:      "1px solid rgba(255,255,255,0.06)",
-        backdropFilter: "blur(20px)",
-        zIndex:         100,
-        padding:        "8px 0 12px",
-      }}
-        className="mobile-nav"
+      <div
+        style={{
+          maxWidth: "1100px",
+          margin: "0 auto",
+          paddingBottom: "100px",
+          overflow: "hidden",
+          position: "relative",
+          width: "100%"
+        }}
       >
-        {TABS.map(tab => (
-          <button
-            key={tab.id}
-            onClick={() => setActiveTab(tab.id)}
+        {/* Main pages container */}
+        <div
+          style={{
+            display: isLeaderboard ? "none" : "flex",
+            width: "400%", // 4 pages
+            transition: "transform 0.35s ease",
+            transform: `translateX(-${pageIndex[page] * 25}%)`
+          }}
+        >
+          <div style={{ width: "25%", flexShrink: 0 }}>
+            <Dashboard quests={quests} wallet={wallet} setPage={setPage} />
+          </div>
+          <div style={{ width: "25%", flexShrink: 0 }}>
+            <QuestBoard quests={quests} wallet={wallet} />
+          </div>
+          <div style={{ width: "25%", flexShrink: 0 }}>
+            <BossRaid wallet={wallet} />
+          </div>
+          <div style={{ width: "25%", flexShrink: 0 }}>
+            <WalletAnalyzer wallet={wallet} />
+          </div>
+        </div>
+
+        {/* Leaderboard overlay */}
+        {isLeaderboard && (
+          <div
             style={{
-              flex:          1,
-              background:    "none",
-              border:        "none",
-              color:         activeTab === tab.id ? "#0052ff" : "#8892a4",
-              fontWeight:    activeTab === tab.id ? "700" : "400",
-              fontSize:      "10px",
-              cursor:        "pointer",
-              display:       "flex",
-              flexDirection: "column",
-              alignItems:    "center",
-              gap:           "4px",
-              padding:       "4px 0",
-              transition:    "color 0.2s",
+              width: "100%",
+              position: "relative",
+              left: 0,
+              transition: "left 0.35s ease"
             }}
           >
-            <span style={{ fontSize: "20px" }}>{tab.icon}</span>
-            <span>{tab.label.split(" ")[0]}</span>
-          </button>
-        ))}
+            <Leaderboard wallet={wallet} />
+          </div>
+        )}
       </div>
 
-      {/* Global styles */}
-      <style>{`
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { background: #0a0b0f; }
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: rgba(255,255,255,0.02); }
-        ::-webkit-scrollbar-thumb { background: rgba(0,82,255,0.3); border-radius: 3px; }
-        input::placeholder { color: #4a5568; }
-        a { color: inherit; }
-        @media (min-width: 768px) { .mobile-nav { display: none !important; } }
-        @media (max-width: 767px) { .mobile-nav { display: flex !important; } }
-      `}</style>
+      {/* Mobile nav */}
+      <div
+        className="mobile-nav"
+        style={{
+          position: "fixed",
+          bottom: "16px",
+          left: "50%",
+          transform: "translateX(-50%)",
+          width: "90%",
+          maxWidth: "480px",
+          display: "flex",
+          justifyContent: "space-between",
+          background: "rgba(10,11,15,0.45)",
+          borderRadius: "9999px",
+          padding: "2px 0",
+          backdropFilter: "blur(18px)",
+          zIndex: 100
+        }}
+      >
+        <div
+          style={{
+            position: "absolute",
+            top: "2%",
+            left: `${highlightPosition}%`,
+            width: `${100 / TABS.length}%`,
+            height: "96%",
+            borderRadius: "9999px",
+            background: "rgba(0,82,255,0.25)",
+            transition: "left 0.3s",
+            zIndex: -1
+          }}
+        />
+
+        {TABS.map((tab, index) => (
+          <div
+            key={tab.id}
+            onClick={() => {
+              setActiveTab(tab.id);
+              setPage(tab.id);
+              setHighlightPosition(index * (100 / TABS.length));
+            }}
+            style={{
+              flex: 1,
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+              cursor: "pointer"
+            }}
+          >
+            <img
+              src={tab.icon}
+              alt={tab.label}
+              style={{
+                width: "22px",
+                height: "22px",
+                filter:
+                  activeTab === tab.id
+                    ? "invert(37%) sepia(98%) saturate(4869%) hue-rotate(199deg) brightness(101%) contrast(101%)"
+                    : "invert(100%)"
+              }}
+            />
+            <span
+              style={{
+                fontSize: "10px",
+                fontWeight: 700,
+                color: activeTab === tab.id ? ICON_BLUE : "white"
+              }}
+            >
+              {tab.label}
+            </span>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
